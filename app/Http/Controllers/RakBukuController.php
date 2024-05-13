@@ -16,7 +16,6 @@ class RakBukuController extends Controller
         echo '</pre>';
     }
 
-
     /**
      * Display a listing of the resource.
      */
@@ -42,46 +41,23 @@ class RakBukuController extends Controller
      */
     public function store(Request $request)
     {
-        $rak = new RakBuku();
-        $rak->nama = $request->input('nama');
-        $rak->lokasi = $request->input('lokasi');
-        $rak->keterangan = $request->input('keterangan');
         $rm = $this->rules_messages();
-        $validator = Validator::make($request->all(), $rm['rules'], $messages = $rm['messages']);
+
+        $validator = Validator::make($request->all(), $rm['rules'], $rm['messages']);
+
         if ($validator->fails()) {
             return redirect('/rak_buku/create')
                 ->withErrors($validator)
                 ->withInput();
         }
-        $validated = $validator->validate();
-        if ($validated) {
-            $rak->save();
-        }
-        return redirect('/rak_buku');
-    }
 
-    private function rules_messages()
-    {
-        $rules = [
-            'nama' => 'required |max:50',
-            'lokasi' => 'required | max:5'
-        ];
-        $messages = [
-            'required' => 'Kolom ini harus diisi.',
-            'max' => 'Karakter yang diisi melebihi ketentuan.'
-        ];
-        $data = [
-            'rules' => $rules,
-            'messages' => $messages
-        ];
-        return $data;
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function show(RakBuku $rakBuku)
-    {
-        return view('rak_buku.destroy', ['rak' => $rakBuku]);
+        $rak = new RakBuku();
+        $rak->nama = $request->input('nama');
+        $rak->lokasi = $request->input('lokasi');
+        $rak->keterangan = $request->input('keterangan');
+        $rak->save();
+
+        return redirect('/rak_buku');
     }
 
     /**
@@ -100,20 +76,21 @@ class RakBukuController extends Controller
      */
     public function update(Request $request, RakBuku $rakBuku)
     {
-        $rakBuku->nama = $request->input('nama');
-        $rakBuku->lokasi = $request->input('lokasi');
-        $rakBuku->keterangan = $request->input('keterangan');
         $rm = $this->rules_messages();
-        $validator = Validator::make($request->all(), $rm['rules'], $messages = $rm['messages']);
+
+        $validator = Validator::make($request->all(), $rm['rules'], $rm['messages']);
+
         if ($validator->fails()) {
             return redirect('/rak_buku/' . $rakBuku->id . '/edit')
                 ->withErrors($validator)
                 ->withInput();
         }
-        $validated = $validator->validate();
-        if ($validated) {
-            $rakBuku->save();
-        }
+
+        $rakBuku->nama = $request->input('nama');
+        $rakBuku->lokasi = $request->input('lokasi');
+        $rakBuku->keterangan = $request->input('keterangan');
+        $rakBuku->save();
+
         return redirect('/rak_buku');
     }
 
@@ -134,5 +111,19 @@ class RakBukuController extends Controller
         $rak->keterangan = $request->input('keterangan');
         $json = Response::json_encode($rak);
         return $json;
+    }
+
+    private function rules_messages()
+    {
+        return [
+            'rules' => [
+                'nama' => 'required|max:50',
+                'lokasi' => 'required|max:5'
+            ],
+            'messages' => [
+                'required' => 'Kolom ini harus diisi.',
+                'max' => 'Karakter yang diisi melebihi ketentuan.'
+            ]
+        ];
     }
 }
